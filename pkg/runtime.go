@@ -39,9 +39,17 @@ func Run(args []string) {
 	}
 }
 
-func Chroot() {
+func Chroot(args []string) {
+	log.Printf("chroot with args %v, PID: %v", args, os.Getpid())
 	log.Println("chroot with no args")
 	syscall.Sethostname([]byte("container"))
+
+	syscall.Chroot("/tmp/harbor/img/")
+	syscall.Chdir("/")
+
+	// mount /proc to make `ps` working
+	syscall.Mount("proc", "proc", "proc", 0, "")
+	defer syscall.Unmount("/proc", 0)
 
 	cmd := exec.Command("/bin/sh")
 
