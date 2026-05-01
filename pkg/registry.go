@@ -1,15 +1,21 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
-	"io"
+	"log"
 	"os"
-	"path/filepath"
+	"strings"
 
 	"github.com/AnshKumar200/Harbor/config"
 	"github.com/heroku/docker-registry-client/registry"
 	"golang.org/x/term"
 )
+
+type ImageId struct {
+	name string
+	tag  string
+}
 
 type ImageStore struct {
 	rootDir string
@@ -33,9 +39,14 @@ func NewRegistryService(imgStore ImageStore) RegistryService {
 	}
 }
 
-func (reg *RegistryService) Pull(image string) error {
-	username, password, err := login(reg.registry)
+func (reg *RegistryService) Pull(imageName string) error {
+	imageId, err := parse(imageName)
 
+	if err != nil {
+		return err
+	}
+
+	username, password, err := login(reg.registry)
 	if err != nil {
 		return err
 	}
@@ -45,35 +56,39 @@ func (reg *RegistryService) Pull(image string) error {
 		return err
 	}
 
-	repo := "arm64v8/alpine"
-	tags, err := hub.Tags(repo)
+	if imageId.tag == "" {
+		imageId.tag = "latest"
+	}
+	manifest, err := hub.ManifestV2(imageId.name, imageId.tag)
 	if err != nil {
 		return err
 	}
-	fmt.Println(tags)
-
-	manifest, err := hub.ManifestV2(repo, "latest")
-	if err != nil {
-		return err
-	}
-	fmt.Println(manifest)
+	log.Printf("Found manifest for image <%s:%s>", imageId.name, imageId.tag)
 
 	digest := manifest.Layers[0].Digest
-	reader, err := hub.DownloadBlob(repo, digest)
+	reader, err := hub.DownloadBlob(imageId.name, digest)
 	if err != nil {
 		return err
 	}
 
-	name := filepath.Base(repo) + ".tar"
-	file, err := os.Create(name)
-	if err != nil {
+	if err := CreateImage(reader, string(digest)); err != nil {
 		return err
 	}
-
-	defer file.Close()
-	io.Copy(file, reader)
 
 	return nil
+}
+
+// name[:TAG]
+// return repository and tag
+func parse(imageName string) (ImageId, error) {
+	s := strings.Split(imageName, ":")
+	if len(s) == 1 {
+		return ImageId{name: s[0]}, nil
+	}
+	if len(s) == 2 {
+		return ImageId{name: s[0], tag: s[1]}, nil
+	}
+	return ImageId{}, errors.New("image name has the wrong format")
 }
 
 func login(registry string) (string, string, error) {
