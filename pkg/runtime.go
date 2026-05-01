@@ -39,13 +39,17 @@ func Run(args []string) {
 	}
 }
 
-func Chroot(args []string) {
-	log.Printf("chroot with args %v, PID: %v", args, os.Getpid())
-	log.Println("chroot with no args")
+func Init(args []string) {
+	log.Printf("Init with args %v, PID: %v", args, os.Getpid())
 	syscall.Sethostname([]byte("container"))
 
-	syscall.Chroot("/tmp/harbor/img/")
-	syscall.Chdir("/")
+	//	syscall.Chroot("/tmp/harbor/img/")
+	if err := syscall.Chroot("/home/ansh/Downloads/alpine_arm64v8"); err != nil {
+		log.Fatal(err)
+	}
+	if err := syscall.Chdir("/"); err != nil {
+		log.Fatal(err)
+	}
 
 	// mount /proc to make `ps` working
 	syscall.Mount("proc", "proc", "proc", 0, "")
