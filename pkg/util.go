@@ -1,8 +1,10 @@
 package pkg
 
 import (
+	"errors"
 	"log"
 	"os"
+	"strings"
 )
 
 func EnsureDir(path string) string {
@@ -15,7 +17,23 @@ func EnsureDir(path string) string {
 func Exist(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err != nil {
-		return !os.IsNotExist(err), nil
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
 	}
-	return false, err
+	return true, nil
+}
+
+// name[:TAG]
+// return repository and tag
+func Parse(imageName string) (ImageId, error) {
+	s := strings.Split(imageName, ":")
+	if len(s) == 1 {
+		return ImageId{Name: s[0], Tag: "latest"}, nil
+	}
+	if len(s) == 2 {
+		return ImageId{Name: s[0], Tag: s[1]}, nil
+	}
+	return ImageId{}, errors.New("image name has the wrong format")
 }
