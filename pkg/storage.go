@@ -111,13 +111,15 @@ func Untar(dst string, r io.Reader) error {
 	defer gzr.Close()
 
 	tr := tar.NewReader(gzr)
+	toSymLink := map[string]string{}
 
+L:
 	for {
 		header, err := tr.Next()
 
 		switch {
 		case err == io.EOF:
-			return nil
+			break L
 		case err != nil:
 			return err
 		case header == nil:
@@ -135,10 +137,7 @@ func Untar(dst string, r io.Reader) error {
 			}
 
 		case tar.TypeSymlink:
-			err := os.Symlink(header.Linkname, target)
-			if err != nil {
-				return err
-			}
+			toSymLink[target] = header.Linkname
 
 		case tar.TypeReg:
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
@@ -152,4 +151,13 @@ func Untar(dst string, r io.Reader) error {
 			f.Close()
 		}
 	}
+	for target, linkName := range toSymLink {
+		// link target -> linkName
+		err := os.Symlink(linkName, target)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
