@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/AnshKumar200/Harbor/cmd/image"
 	"github.com/spf13/cobra"
 )
 
@@ -11,6 +12,7 @@ func init() {
 	rootCmd.AddCommand(pullCommand)
 	rootCmd.AddCommand(runCommand)
 	rootCmd.AddCommand(techCommand)
+	rootCmd.AddCommand(image.Command)
 }
 
 var rootCmd = &cobra.Command{
