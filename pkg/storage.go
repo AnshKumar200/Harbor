@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -54,6 +55,17 @@ func (s ImageStore) CreateImage(reader io.ReadCloser, image ImageId) error {
 	return nil
 }
 
+func (s ImageStore) RemoveImage(img *ImageId) (*ImageId, error) {
+	found, err := s.FindImage(img)
+	if err != nil {
+		return nil, err
+	}
+	if found == nil {
+		return nil, fmt.Errorf("image <%s:%s> not found", img.Name, img.Tag)
+	}
+	return found, os.RemoveAll(path.Join(s.rootDir, found.Digest))
+}
+
 func (s ImageStore) ListImages() ([]*ImageId, error) {
 	return s.findImages(nil)
 }
@@ -62,6 +74,9 @@ func (s ImageStore) FindImage(image *ImageId) (*ImageId, error) {
 	found, err := s.findImages(image)
 	if err != nil {
 		return nil, err
+	}
+	if len(found) == 0 {
+		return nil, nil
 	}
 	return found[0], nil
 }

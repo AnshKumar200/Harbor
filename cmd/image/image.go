@@ -7,6 +7,7 @@ import (
 
 func init() {
 	Command.AddCommand(listCommand)
+	Command.AddCommand(removeCommand)
 }
 
 var Command = &cobra.Command{
