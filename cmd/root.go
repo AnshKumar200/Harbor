@@ -13,6 +13,7 @@ func init() {
 	rootCmd.AddCommand(runCommand)
 	rootCmd.AddCommand(techCommand)
 	rootCmd.AddCommand(image.Command)
+	rootCmd.AddCommand(rmCommand)
 }
 
 var rootCmd = &cobra.Command{

@@ -166,3 +166,10 @@ func (r runtimeService) RemoveImage(name string, tag string) error {
 	}
 	return r.imgStore.RemoveImage(img.Digest)
 }
+
+func (r runtimeService) RemoveContainerById(id string) error {
+	if id == "" {
+		return fmt.Errorf("container id required")
+	}
+	return r.conStore.RemoveContainer(id)
+}
