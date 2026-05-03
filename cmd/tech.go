@@ -11,9 +11,8 @@ var techCommand = &cobra.Command{
 	Use:   "tech",
 	Short: "Technical subcommand used by harbor itself",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println("Go tech with args:", args)
 		runtime := pkg.NewRuntimeService()
-		if err := runtime.InitContainer(args); err != nil {
+		if err := runtime.InitContainer(args[0], args[1], args[2]); err != nil {
 			log.Fatal(err)
 		}
 	},

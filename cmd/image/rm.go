@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/AnshKumar200/Harbor/cmd/input"
 	"github.com/AnshKumar200/Harbor/pkg"
-	"github.com/AnshKumar200/Harbor/pkg/image"
 	"github.com/spf13/cobra"
 )
 
@@ -14,15 +14,12 @@ var removeCommand = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Short: "Remove image",
 	Run: func(cmd *cobra.Command, args []string) {
-		img, err := image.Parse(args[0])
-		if err != nil {
-			log.Fatal(err)
-		}
+		imageName, imageTag := input.Parse(args[0])
 		runtime := pkg.NewRuntimeService()
-		if err := runtime.RemoveImage(img.Name, img.Tag); err != nil {
+		if err := runtime.RemoveImage(imageName, imageTag); err != nil {
 			log.Fatal(err)
 		} else {
-			fmt.Printf("Image <%s:%s> deleted\n", img.Name, img.Tag)
+			fmt.Printf("Image deleted: %s:%s\n", imageName, imageTag)
 		}
 	},
 }

@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"syscall"
 	"time"
 
@@ -30,9 +29,8 @@ func NewRuntimeService() *runtimeService {
 	}
 }
 
-func Run(args []string) {
-	log.Println("run with args", args)
-	cmd := exec.Command("/proc/self/exe", append([]string{"tech"}, args...)...)
+func Run(imageName string, imageTag string, containerName string) {
+	cmd := exec.Command("/proc/self/exe", append([]string{"tech"}, imageName, imageTag, containerName)...)
 	// cmd := exec.Command("/bin/sh")
 	// cmd.SysProcAttr = &syscall.SysProcAttr{}
 	// cmd.SysProcAttr = &syscall.SysProcAttr{Cloneflags: syscall.CLONE_NEWUTS}
@@ -62,20 +60,13 @@ func Run(args []string) {
 	}
 }
 
-func (r runtimeService) InitContainer(args []string) error {
-	log.Printf("Init with args %v, PID: %v", args, os.Getpid())
-
-	input, err := image.Parse(args[0])
-	if err != nil {
-		return err
-	}
-
-	img, err := r.FindImageByNameAndId(input.Name, input.Tag)
+func (r runtimeService) InitContainer(imageName string, imageTag string, containerName string) error {
+	img, err := r.FindImageByNameAndId(imageName, imageTag)
 	if err != nil {
 		return err
 	}
 	if img == nil {
-		return fmt.Errorf("image <%s:%s> not found", input.Name, input.Tag)
+		return fmt.Errorf("image not found: %s:%s", imageName, imageTag)
 	}
 	imgH := r.imgStore.GetImage(img.Digest)
 
@@ -87,7 +78,7 @@ func (r runtimeService) InitContainer(args []string) error {
 
 	contH.SetSpec(container.Container{
 		ID:        uuid,
-		Name:      "containerName",
+		Name:      containerName,
 		Image:     *img,
 		CreatedAt: time.Now(),
 	})
@@ -99,7 +90,7 @@ func (r runtimeService) InitContainer(args []string) error {
 	if err := syscall.Chdir("/"); err != nil {
 		return err
 	}
-	syscall.Sethostname([]byte(filepath.Base(img.Name)))
+	syscall.Sethostname([]byte(uuid))
 
 	// mount /proc to make `ps` working
 	syscall.Mount("proc", "proc", "proc", 0, "")

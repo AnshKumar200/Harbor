@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/AnshKumar200/Harbor/config"
+	"github.com/AnshKumar200/Harbor/cmd/input"
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/AnshKumar200/Harbor/pkg/storage"
 	"github.com/AnshKumar200/Harbor/pkg/util"
@@ -18,9 +19,10 @@ var pullCommand = &cobra.Command{
 		regSvc := pkg.NewRegistryService(
 			storage.NewImageStore(util.EnsureDir(config.DefaultImageStoreRootDir)),
 		)
-		img := args[0]
-		if err := regSvc.Pull(img); err != nil {
-			log.Println("Failed to pull the image ", img, ": ", err)
+
+		name, tag := input.Parse(args[0])
+		if err := regSvc.Pull(name, tag); err != nil {
+			log.Fatalf("Failed to pull the image: %s\n", err)
 		}
 	},
 }
