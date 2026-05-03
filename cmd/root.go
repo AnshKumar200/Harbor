@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/AnshKumar200/Harbor/cmd/image"
@@ -22,7 +21,7 @@ var rootCmd = &cobra.Command{
 	Short: "harbor",
 	Long:  "harbor",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Welcome to harbor")
+		cmd.Help()
 	},
 }
 

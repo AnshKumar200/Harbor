@@ -9,7 +9,7 @@ import (
 
 var techCommand = &cobra.Command{
 	Use:   "tech",
-	Short: "technical subcommand used by harbor itself",
+	Short: "Technical subcommand used by harbor itself",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Go tech with args:", args)
 		runtime := pkg.NewRuntimeService()
