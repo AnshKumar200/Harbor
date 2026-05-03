@@ -14,6 +14,7 @@ func init() {
 	rootCmd.AddCommand(techCommand)
 	rootCmd.AddCommand(image.Command)
 	rootCmd.AddCommand(rmCommand)
+	rootCmd.AddCommand(psCommand)
 }
 
 var rootCmd = &cobra.Command{

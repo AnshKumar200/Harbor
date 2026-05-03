@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,6 +20,23 @@ func NewContainerHandle(id string, contDir string) *ContainerHandle {
 		id:      id,
 		contDir: contDir,
 	}
+}
+
+func (h *ContainerHandle) SetSpec(content any) error {
+	f, err := os.OpenFile(h.SpecFile(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+	encoder := json.NewEncoder(f)
+	if err := encoder.Encode(content); err != nil {
+		return err
+	}
+	return nil
+}
+
+// /var/btrfs/img/abc/source
+func (h *ContainerHandle) SpecFile() string {
+	return filepath.Join(h.contDir, "spec.json")
 }
 
 // /var/btrfs/cont/abc/rootfs/
