@@ -6,22 +6,18 @@ import (
 	"os"
 
 	"github.com/AnshKumar200/Harbor/config"
+	"github.com/AnshKumar200/Harbor/pkg/image"
+	"github.com/AnshKumar200/Harbor/pkg/storage"
 	"github.com/heroku/docker-registry-client/registry"
 	"golang.org/x/term"
 )
 
-type ImageId struct {
-	Name   string `json:"name"`
-	Tag    string `json:"tag"`
-	Digest string `json:"digest"`
-}
-
 type RegistryService struct {
 	registry string
-	imgStore ImageStore
+	imgStore storage.ImageStore
 }
 
-func NewRegistryService(imgStore ImageStore) RegistryService {
+func NewRegistryService(imgStore storage.ImageStore) RegistryService {
 	return RegistryService{
 		registry: config.DefaultRegistry,
 		imgStore: imgStore,
@@ -29,7 +25,7 @@ func NewRegistryService(imgStore ImageStore) RegistryService {
 }
 
 func (reg *RegistryService) Pull(imageName string) error {
-	image, err := Parse(imageName)
+	image, err := image.Parse(imageName)
 
 	if err != nil {
 		return err
@@ -58,7 +54,12 @@ func (reg *RegistryService) Pull(imageName string) error {
 	}
 
 	image.Digest = string(digest)
-	if err := reg.imgStore.CreateImage(reader, image); err != nil {
+	imgH, err := reg.imgStore.CreateImage(reader, image.Digest)
+	if err != nil {
+		return err
+	}
+
+	if err := imgH.SetSource(image); err != nil {
 		return err
 	}
 

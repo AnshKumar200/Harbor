@@ -2,6 +2,16 @@
 
 A container runtime built from scratch in Go using Linux namespaces, cgroups, and chroot.
 
+## Prerequisites
+
+Harbor runs only on Linux-based system with version 3.10 or higher of the Linux kernel.
+
+Required packages:
+- libcgroup-tools
+
+Required configuration:
+- A btrfs filesystem mounted under /var/btrfs
+
 ## Install
 
 ```bash
