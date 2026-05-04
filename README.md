@@ -10,7 +10,8 @@ Required packages:
 - libcgroup-tools
 
 Required configuration:
-- A btrfs filesystem mounted under /var/harbor
+- A btrfs filesystem mounted under /var/harbor (configurable)
+- A cgroup filesystem mounted under /sys/fs/cgroup/ (configurable) if not already the case
 
 ## Install
 
@@ -23,8 +24,14 @@ cd build
 ```
 
 ## Usage
+When using Harbor, you need to be specific when pulling or running an image. For example, use `pull amd64/alpine` instead of just `pull alpine`. We encourage using harbor with sudo privileges.
+
 ```shell
+# most of harbor commands require privileges
+sudo su
+
 ./Harbor image list
 ./Harbor pull arm64v8/alpine
+./Harbor run arm64v8/alpine:latest /bin/sh
 ./H2arbor run arm64v8/alpine
 ```

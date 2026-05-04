@@ -10,10 +10,10 @@ import (
 func init() {
 	rootCmd.AddCommand(pullCommand)
 	rootCmd.AddCommand(runCommand)
-	rootCmd.AddCommand(techCommand)
 	rootCmd.AddCommand(image.Command)
 	rootCmd.AddCommand(rmCommand)
 	rootCmd.AddCommand(psCommand)
+	rootCmd.AddCommand(internalCommand)
 }
 
 var rootCmd = &cobra.Command{
