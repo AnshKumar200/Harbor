@@ -1,7 +1,7 @@
 package config
 
 const (
-	DefaultImageStoreRootDir     = "/var/btrfs/img"
-	DefaultContainerStoreRootDir = "/var/btrfs/cont"
+	DefaultImageStoreRootDir     = "/var/harbor/img"
+	DefaultContainerStoreRootDir = "/var/harbor/cont"
 	DefaultRegistry              = "https://registry-1.docker.io/"
 )

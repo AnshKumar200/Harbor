@@ -10,7 +10,7 @@ Required packages:
 - libcgroup-tools
 
 Required configuration:
-- A btrfs filesystem mounted under /var/btrfs
+- A btrfs filesystem mounted under /var/harbor
 
 ## Install
 
