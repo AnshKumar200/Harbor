@@ -3,8 +3,8 @@ package cmd
 import (
 	"log"
 
-	"github.com/AnshKumar200/Harbor/config"
 	"github.com/AnshKumar200/Harbor/cmd/input"
+	"github.com/AnshKumar200/Harbor/config"
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/AnshKumar200/Harbor/pkg/storage"
 	"github.com/AnshKumar200/Harbor/pkg/util"
@@ -17,7 +17,7 @@ var pullCommand = &cobra.Command{
 	Short: "Pull container image",
 	Run: func(cmd *cobra.Command, args []string) {
 		regSvc := pkg.NewRegistryService(
-			storage.NewImageStore(util.EnsureDir(config.DefaultImageStoreRootDir)),
+			storage.NewImageStore(util.EnsureDir(config.DefaultImageStoreRootDir), storage.Btrfs{}),
 		)
 
 		name, tag := input.Parse(args[0])
