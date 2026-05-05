@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/AnshKumar200/Harbor/pkg/util"
-	"github.com/containerd/btrfs"
 )
 
 type ContainerHandle struct {
@@ -51,11 +50,13 @@ func (h *ContainerHandle) ContDir() string {
 
 type ContainerStore struct {
 	rootDir string
+	fs      COWFS
 }
 
-func NewContainerStore(rootDir string) *ContainerStore {
+func NewContainerStore(rootDir string, fs COWFS) *ContainerStore {
 	return &ContainerStore{
 		rootDir: rootDir,
+		fs:      fs,
 	}
 }
 
@@ -88,7 +89,7 @@ func (s *ContainerStore) GetContainer(id string) *ContainerHandle {
 
 func (s *ContainerStore) CreateContainer(id string, imagePath string) (*ContainerHandle, error) {
 	contDir := filepath.Join(s.RootDir(), id)
-	if err := btrfs.SubvolSnapshot(contDir, imagePath, false); err != nil {
+	if err := s.fs.SubvolSnapshot(contDir, imagePath); err != nil {
 		return nil, err
 	}
 	return NewContainerHandle(id, contDir), nil
