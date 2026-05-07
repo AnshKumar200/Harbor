@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/AnshKumar200/Harbor/cmd/input"
 	"github.com/AnshKumar200/Harbor/config"
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/AnshKumar200/Harbor/pkg/storage"
 	"github.com/AnshKumar200/Harbor/pkg/util"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +21,7 @@ var pullCommand = &cobra.Command{
 
 		name, tag := input.Parse(args[0])
 		if err := regSvc.Pull(name, tag); err != nil {
-			log.Fatalf("Failed to pull the image: %s\n", err)
+			logrus.Fatalf("Failed to pull the image: %s\n", err)
 		}
 	},
 }

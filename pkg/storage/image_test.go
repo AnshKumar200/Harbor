@@ -32,9 +32,9 @@ func TestCreateImage(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		wg.Done()
-		err := testutil(w, []string{})
+		err := testutil.CreateTarball(w, []string{})
 		if err != nil {
-			log.Fatal("Could not create empty image tar file: ", err)
+			t.Fatal("Could not create empty image tar file: ", err)
 		}
 		w.Close()
 	}()
@@ -43,9 +43,9 @@ func TestCreateImage(t *testing.T) {
 	wg.Wait()
 
 	if err != nil {
-		log.Fatal("Could not create image", err)
+		t.Fatal("Could not create image", err)
 	}
 	if h == nil {
-		log.Fatal("Could not create image: CreateImage returned nil")
+		t.Fatal("Could not create image: CreateImage returned nil")
 	}
 }

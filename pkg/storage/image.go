@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/AnshKumar200/Harbor/pkg/util"
+	"github.com/sirupsen/logrus"
 )
 
 type ImageStore struct {
@@ -19,7 +19,7 @@ type ImageStore struct {
 func NewImageStore(rootDir string, fs COWFS) ImageStore {
 	return ImageStore{
 		rootDir: rootDir,
-		fs: fs,
+		fs:      fs,
 	}
 }
 
@@ -47,7 +47,7 @@ func (s ImageStore) CreateImage(reader io.ReadCloser, id string) (*ImageHandle, 
 	h := NewImageHandle(id, iDir)
 
 	if prs {
-		log.Printf("image <%s> already exists", iDir)
+		logrus.WithField("directory", iDir).Info("image already exists")
 		return h, nil
 	}
 
@@ -59,7 +59,10 @@ func (s ImageStore) CreateImage(reader io.ReadCloser, id string) (*ImageHandle, 
 		return h, err
 	}
 
-	log.Printf("image <%s> stored in <%s>", h.id, s.rootDir)
+	logrus.WithFields(logrus.Fields{
+		"image":    h.id,
+		"location": s.rootDir,
+	}).Debug()
 	return h, nil
 }
 
@@ -67,7 +70,7 @@ func (s ImageStore) GetImage(id string) *ImageHandle {
 	d := filepath.Join(s.RootDir(), id)
 	ok, err := util.Exist(d)
 	if err != nil {
-		log.Println("Warning: ", err)
+		logrus.Error(err)
 		return nil
 	}
 	if !ok {

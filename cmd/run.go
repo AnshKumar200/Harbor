@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/AnshKumar200/Harbor/cmd/input"
 	"github.com/AnshKumar200/Harbor/pkg"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +27,7 @@ var runCommand = &cobra.Command{
 		runtime := pkg.NewRuntimeService()
 
 		if err := runtime.Run(req); err != nil {
-			log.Fatal(err)
+			logrus.Fatal(err)
 		}
 	},
 }
