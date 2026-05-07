@@ -1,14 +1,15 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/AnshKumar200/Harbor/cmd/image"
 	"github.com/AnshKumar200/Harbor/config"
-	"github.com/AnshKumar200/Harbor/pkg/logging"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var verbosity int
+var logLevel string
 
 func init() {
 	rootCmd.AddCommand(pullCommand)
@@ -18,14 +19,21 @@ func init() {
 	rootCmd.AddCommand(psCommand)
 	rootCmd.AddCommand(internalCommand)
 
-	rootCmd.PersistentFlags().IntVarP(&verbosity, "verbose", "v", int(config.DefaultLogLevel), "0 to 6: Trace, Debug, Info, Warn, Error, Fatal, Panic")
-	logrus.SetLevel(logging.VerbosityToLogrusLevel(verbosity))
+	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "l", config.DefaultLogLevel,
+		"Set the logging level (\"trace\"|\"debug\"|\"info\"|\"warn\"|\"error\"|\"fatal\"|\"panic\")")
 }
 
 var rootCmd = &cobra.Command{
 	Use:   "harbor",
 	Short: "harbor",
 	Long:  "harbor",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		l, err := logrus.ParseLevel(logLevel)
+		if err != nil {
+			log.Fatal("Failed to set logger: ", err)
+		}
+		logrus.SetLevel(l)
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
