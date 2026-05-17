@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/AnshKumar200/Harbor/cmd/input"
+	"github.com/AnshKumar200/Harbor/config"
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,4 +35,6 @@ var runCommand = &cobra.Command{
 
 func init() {
 	runCommand.Flags().StringVarP(&req.ContainerName, "name", "", "", "Assign a name to the container")
+	runCommand.Flags().IntVar(&req.PidsLimit, "pids-limit", config.DefaultPidsLimit, "Limit the number of  container tasks")
+	runCommand.Flags().IntVarP(&req.MemoryLimit, "memory", "m", config.DefaultMemoryLimit, "Limit the number of  container tasks")
 }
