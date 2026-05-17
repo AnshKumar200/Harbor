@@ -24,10 +24,10 @@ cd build
 ```
 
 ## Usage
-When using Harbor, you need to be specific when pulling or running an image. For example, use `pull amd64/alpine` instead of just `pull alpine`. We encourage using harbor with sudo privileges.
+When using Harbor, you need to be specific when pulling or running an image. For example, use `pull amd64/alpine` instead of just `pull alpine`.
 
 ```shell
-# most of harbor commands require privileges
+# harbor requires root privileges
 sudo su
 
 ./Harbor image list
