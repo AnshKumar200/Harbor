@@ -1,9 +1,12 @@
 package cgroups
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 )
 
@@ -31,6 +34,34 @@ func (c CGroup) NewGroup(name string) Group {
 
 func (g Group) Delete() error {
 	return os.Remove(g.getPidsDir())
+}
+
+func (g Group) getCpuDir() string {
+	return filepath.Join(g.cgroupDir, "cpu", "harbor", g.name)
+}
+
+func (g Group) getCfsPeriodFile() string {
+	return filepath.Join(g.getCpuDir(), "cpu.cfs_period_us")
+}
+
+func (g Group) getCfsQuotaFile() string {
+	return filepath.Join(g.getCpuDir(), "cpu.cfs_quota_us")
+}
+
+// setCpuLimit sets the limit in number of CPU
+func (g Group) SetCpuLimit(cpu int) error {
+	if cpu > runtime.NumCPU() {
+		logrus.Info("CPU limit has been set to max")
+		cpu = runtime.NumCPU()
+	}
+	period := 1000000
+	if err := write(g.getCfsPeriodFile(), period); err != nil {
+		return fmt.Errorf("could not set CFS Period: %v", err)
+	}
+	if err := write(g.getCfsQuotaFile(), cpu*period); err != nil {
+		return fmt.Errorf("could not set CFS Quota: %v", err)
+	}
+	return nil
 }
 
 // /sys/fs/cgroup/memory/harbor/abc
