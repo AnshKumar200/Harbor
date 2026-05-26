@@ -4,6 +4,7 @@ import (
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var internReq pkg.RunRequest
@@ -12,9 +13,12 @@ var internalCommand = &cobra.Command{
 	Use:   "internal",
 	Short: "Internal command for harbor itself",
 	Run: func(cmd *cobra.Command, args []string) {
-		r := pkg.NewRuntimeService()
-		if err := r.InitContainer(internReq); err != nil {
-			logrus.Fatal(err)
+		e, err := pkg.NewRuntimeService().InitContainer(internReq)
+		if err != nil {
+			logrus.WithError(err).Fatal("Internal: Failed to run container")
+		}
+		if e != nil {
+			os.Exit(*e)
 		}
 	},
 }

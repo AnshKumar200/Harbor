@@ -6,6 +6,7 @@ import (
 	"github.com/AnshKumar200/Harbor/pkg"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var req pkg.RunRequest
@@ -25,10 +26,12 @@ var runCommand = &cobra.Command{
 			req.ContainerArgs = args[2:]
 		}
 
-		runtime := pkg.NewRuntimeService()
-
-		if err := runtime.Run(req); err != nil {
-			logrus.Fatal(err)
+		e, err := pkg.NewRuntimeService().Run(req)
+		if err != nil {
+			logrus.WithError(err).Fatal("Failed to run container")
+		}
+		if e != nil {
+			os.Exit(*e)
 		}
 	},
 }
